@@ -5,6 +5,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { 
   getFirestore, collection, addDoc, getDocs 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { 
+  getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // Configuración de Firebase (tuya)
 const firebaseConfig = {
@@ -16,20 +19,66 @@ const firebaseConfig = {
   appId: "1:398426404477:web:731e968b9e0a45f2976314"
 };
 
-// Inicializar Firebase y Firestore
+// Inicializar Firebase y servicios
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
 console.log("✅ Firebase conectado correctamente");
 
 // ---------------------------
-// 🧪 Lógica del prototipo
+// 🔥 Firebase Auth (Google Sign-In)
 // ---------------------------
 
-// Botón login (más adelante conectamos Firebase Auth)
-document.getElementById('btn-login').addEventListener('click', () => {
-  alert('Aquí irá la autenticación con Firebase.');
+// Botón: iniciar sesión
+document.getElementById('btn-login').addEventListener('click', async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    console.log("✅ Usuario autenticado:", user);
+
+    // Guardar usuario en Firestore
+    await addDoc(collection(db, "users"), {
+      name: user.displayName,
+      email: user.email,
+      photo: user.photoURL,
+      createdAt: new Date()
+    });
+
+    cargarUsuarios();
+  } catch (error) {
+    console.error("❌ Error en login:", error);
+  }
 });
+
+// Botón: cerrar sesión
+document.getElementById('btn-logout').addEventListener('click', async () => {
+  try {
+    await signOut(auth);
+    console.log("👋 Sesión cerrada");
+  } catch (error) {
+    console.error("❌ Error al cerrar sesión:", error);
+  }
+});
+
+// Detectar cambios de sesión y actualizar UI
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log("🔵 Usuario conectado:", user.email);
+    document.getElementById('btn-login').style.display = "none";
+    document.getElementById('btn-logout').style.display = "inline-block";
+  } else {
+    console.log("⚪ Ningún usuario conectado");
+    document.getElementById('btn-login').style.display = "inline-block";
+    document.getElementById('btn-logout').style.display = "none";
+  }
+});
+
+// ---------------------------
+// 🧪 Lógica del prototipo
+// ---------------------------
 
 // Botón Plan Rápido
 document.getElementById('btn-plan-rapido').addEventListener('click', () => {
@@ -53,7 +102,7 @@ document.getElementById('btn-add-user').addEventListener('click', async () => {
     });
 
     console.log("✅ Usuario agregado con ID:", docRef.id);
-    cargarUsuarios(); // recargamos lista después de agregar
+    cargarUsuarios();
   } catch (e) {
     console.error("❌ Error al agregar usuario:", e);
   }
@@ -65,13 +114,14 @@ async function cargarUsuarios() {
   let html = "<ul>";
   querySnapshot.forEach((doc) => {
     const data = doc.data();
-    html += `<li><b>${data.name}</b> (${data.email}) — ${data.mood}</li>`;
+    html += `<li><b>${data.name}</b> (${data.email}) — ${data.mood ?? "🤔"}</li>`;
   });
   html += "</ul>";
   document.getElementById('user-result').innerHTML = html;
 }
 
-// Ejecutar carga inicial al abrir la página
+// Ejecutar carga inicial
 cargarUsuarios();
+
 
 
