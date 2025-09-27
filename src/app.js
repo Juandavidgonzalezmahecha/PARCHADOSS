@@ -1,10 +1,10 @@
 // ---------------------------
 // 🔥 Inicialización Firebase
 // ---------------------------
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
-
-console.log("📥 Importando Firebase...");
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { 
+  getFirestore, collection, addDoc, getDocs 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // Configuración de Firebase (tuya)
 const firebaseConfig = {
@@ -26,17 +26,51 @@ console.log("✅ Firebase conectado correctamente");
 // 🧪 Lógica del prototipo
 // ---------------------------
 
-// Mensaje de prueba inicial
-console.log("PARCHADOSS prototype loaded");
-
-// Evento: botón login (luego conectaremos con Firebase Auth)
+// Botón login (más adelante conectamos Firebase Auth)
 document.getElementById('btn-login').addEventListener('click', () => {
   alert('Aquí irá la autenticación con Firebase.');
 });
 
-// Evento: botón "Plan rápido"
+// Botón Plan Rápido
 document.getElementById('btn-plan-rapido').addEventListener('click', () => {
   const out = document.getElementById('plan-result');
   out.innerHTML = '<h3>Plan rápido de ejemplo</h3><p>Paseo corto + café</p>';
 });
+
+// ---------------------------
+// 🔥 Firestore: Users
+// ---------------------------
+
+// Agregar usuario de prueba
+document.getElementById('btn-add-user').addEventListener('click', async () => {
+  try {
+    const docRef = await addDoc(collection(db, "users"), {
+      name: "Usuario Demo",
+      email: "demo@parchadoss.com",
+      mood: "😎 motivado",
+      createdAt: new Date()
+    });
+
+    console.log("✅ Usuario agregado con ID:", docRef.id);
+    cargarUsuarios(); // recargamos lista después de agregar
+  } catch (e) {
+    console.error("❌ Error al agregar usuario:", e);
+  }
+});
+
+// Cargar usuarios de Firestore y mostrarlos
+async function cargarUsuarios() {
+  const querySnapshot = await getDocs(collection(db, "users"));
+  let html = "<ul>";
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    html += `<li><b>${data.name}</b> (${data.email}) — ${data.mood}</li>`;
+  });
+  html += "</ul>";
+  document.getElementById('user-result').innerHTML = html;
+}
+
+// Ejecutar carga inicial al abrir la página
+cargarUsuarios();
+
 
