@@ -43,6 +43,7 @@ document.getElementById('btn-plan-rapido').addEventListener('click', () => {
 
 // Agregar usuario de prueba
 document.getElementById('btn-add-user').addEventListener('click', async () => {
+  console.log("👉 Botón clickeado, intentando agregar usuario...");
   try {
     const docRef = await addDoc(collection(db, "users"), {
       name: "Usuario Demo",
