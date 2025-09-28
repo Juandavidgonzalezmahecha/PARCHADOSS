@@ -8,10 +8,16 @@
 </head>
 <body>
   <header class="topbar">
-    <h1>PARCHADOSS</h1>
-    <button id="btn-login">Iniciar sesión</button>
-    <button id="btn-logout" style="display:none;">Cerrar sesión</button>
-  </header>
+  <h1>PARCHADOSS</h1>
+  <button id="btn-login">Iniciar sesión</button>
+  <button id="btn-logout" style="display:none;">Cerrar sesión</button>
+
+  <!-- 🔥 Info del usuario logueado -->
+  <div id="user-info" style="display:none; margin-left: 10px;">
+    <img id="user-photo" src="" alt="Foto de perfil" style="width:30px; height:30px; border-radius:50%;">
+    <span id="user-name"></span>
+  </div>
+</header>
 
   <main class="container">
     <section id="plan-rapido" class="card">
