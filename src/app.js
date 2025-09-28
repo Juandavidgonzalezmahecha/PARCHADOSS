@@ -68,7 +68,7 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     console.log("🔵 Usuario conectado:", user.email);
 
-    // Mostrar botones
+    // Mostrar botones correctos
     document.getElementById('btn-login').style.display = "none";
     document.getElementById('btn-logout').style.display = "inline-block";
 
@@ -135,6 +135,3 @@ async function cargarUsuarios() {
 
 // Ejecutar carga inicial
 cargarUsuarios();
-
-
-
