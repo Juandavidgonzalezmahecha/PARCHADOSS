@@ -7,31 +7,34 @@
   <link rel="stylesheet" href="src/styles.css">
 </head>
 <body>
+  <!-- 🔥 Header con login/logout y datos de usuario -->
   <header class="topbar">
-  <h1>PARCHADOSS</h1>
-  <button id="btn-login">Iniciar sesión</button>
-  <button id="btn-logout" style="display:none;">Cerrar sesión</button>
+    <h1>PARCHADOSS</h1>
+    <button id="btn-login">Iniciar sesión</button>
+    <button id="btn-logout" style="display:none;">Cerrar sesión</button>
 
-  <!-- 🔥 Info del usuario logueado -->
-  <div id="user-info" style="display:none; margin-left: 10px;">
-    <img id="user-photo" src="" alt="Foto de perfil" style="width:30px; height:30px; border-radius:50%;">
-    <span id="user-name"></span>
-  </div>
-</header>
+    <!-- Info del usuario logueado -->
+    <div id="user-info" style="display:none; margin-left: 10px; align-items:center; gap:5px;">
+      <img id="user-photo" src="" alt="Foto de perfil" style="width:30px; height:30px; border-radius:50%;">
+      <span id="user-name"></span>
+    </div>
+  </header>
 
   <main class="container">
+    <!-- Sección Plan rápido -->
     <section id="plan-rapido" class="card">
       <h2>Plan Rápido</h2>
       <button id="btn-plan-rapido">Quiero un plan</button>
       <div id="plan-result"></div>
     </section>
 
+    <!-- Sección Explorar -->
     <section id="explorar" class="card">
       <h2>Explorar</h2>
       <div id="cards-list"></div>
     </section>
 
-    <!-- 🔥 Nueva sección para Firestore -->
+    <!-- Sección Firestore: usuarios -->
     <section id="test-firestore" class="card">
       <h2>Usuarios en Firestore</h2>
       <button id="btn-add-user">Agregar usuario de prueba</button>
@@ -43,5 +46,3 @@
   <script type="module" src="./src/app.js"></script>
 </body>
 </html>
-
-
