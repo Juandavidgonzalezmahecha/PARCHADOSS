@@ -67,12 +67,25 @@ document.getElementById('btn-logout').addEventListener('click', async () => {
 onAuthStateChanged(auth, (user) => {
   if (user) {
     console.log("🔵 Usuario conectado:", user.email);
+
+    // Mostrar botones
     document.getElementById('btn-login').style.display = "none";
     document.getElementById('btn-logout').style.display = "inline-block";
+
+    // Mostrar info del usuario
+    document.getElementById('user-info').style.display = "inline-flex";
+    document.getElementById('user-name').textContent = user.displayName;
+    document.getElementById('user-photo').src = user.photoURL;
+
   } else {
     console.log("⚪ Ningún usuario conectado");
+
+    // Resetear botones
     document.getElementById('btn-login').style.display = "inline-block";
     document.getElementById('btn-logout').style.display = "none";
+
+    // Ocultar info del usuario
+    document.getElementById('user-info').style.display = "none";
   }
 });
 
