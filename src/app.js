@@ -2,14 +2,14 @@
 // 🔥 Inicialización Firebase
 // ---------------------------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { 
-  getFirestore, collection, addDoc, getDocs 
+import {
+  getFirestore, collection, addDoc, getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { 
-  getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged 
+import {
+  getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// Configuración de Firebase (tuya)
+// Configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAj19b4CcAkbqMj87MtJ4aPY93S1Uw_Ar8",
   authDomain: "parchadoss.firebaseapp.com",
@@ -28,18 +28,23 @@ const provider = new GoogleAuthProvider();
 console.log("✅ Firebase conectado correctamente");
 
 // ---------------------------
-// 🔥 Firebase Auth (Google Sign-In)
+// 🔐 Autenticación con Google
 // ---------------------------
 
-// Botón: iniciar sesión
-document.getElementById('btn-login').addEventListener('click', async () => {
+const btnLogin = document.getElementById("btn-login");
+const btnLogout = document.getElementById("btn-logout");
+const userInfo = document.getElementById("user-info");
+const userName = document.getElementById("user-name");
+const userPhoto = document.getElementById("user-photo");
+
+// Iniciar sesión
+btnLogin.addEventListener("click", async () => {
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
+    console.log("✅ Usuario autenticado:", user.email);
 
-    console.log("✅ Usuario autenticado:", user);
-
-    // Guardar usuario en Firestore
+    // Guardar en Firestore (si no existe)
     await addDoc(collection(db, "users"), {
       name: user.displayName,
       email: user.email,
@@ -49,63 +54,49 @@ document.getElementById('btn-login').addEventListener('click', async () => {
 
     cargarUsuarios();
   } catch (error) {
-    console.error("❌ Error en login:", error);
+    console.error("❌ Error al iniciar sesión:", error);
   }
 });
 
-// Botón: cerrar sesión
-document.getElementById('btn-logout').addEventListener('click', async () => {
+// Cerrar sesión
+btnLogout.addEventListener("click", async () => {
   try {
     await signOut(auth);
-    console.log("👋 Sesión cerrada");
+    console.log("👋 Sesión cerrada correctamente");
   } catch (error) {
     console.error("❌ Error al cerrar sesión:", error);
   }
 });
 
-// Detectar cambios de sesión y actualizar UI
+// Detectar sesión activa
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    console.log("🔵 Usuario conectado:", user.email);
-
-    // Mostrar botones correctos
-    document.getElementById('btn-login').style.display = "none";
-    document.getElementById('btn-logout').style.display = "inline-block";
-
-    // Mostrar info del usuario
-    document.getElementById('user-info').style.display = "inline-flex";
-    document.getElementById('user-name').textContent = user.displayName;
-    document.getElementById('user-photo').src = user.photoURL;
-
+    btnLogin.style.display = "none";
+    btnLogout.style.display = "inline-block";
+    userInfo.style.display = "inline-flex";
+    userName.textContent = user.displayName;
+    userPhoto.src = user.photoURL;
   } else {
-    console.log("⚪ Ningún usuario conectado");
-
-    // Resetear botones
-    document.getElementById('btn-login').style.display = "inline-block";
-    document.getElementById('btn-logout').style.display = "none";
-
-    // Ocultar info del usuario
-    document.getElementById('user-info').style.display = "none";
+    btnLogin.style.display = "inline-block";
+    btnLogout.style.display = "none";
+    userInfo.style.display = "none";
   }
 });
 
 // ---------------------------
-// 🧪 Lógica del prototipo
+// 🧠 Lógica básica del prototipo
 // ---------------------------
 
-// Botón Plan Rápido
-document.getElementById('btn-plan-rapido').addEventListener('click', () => {
-  const out = document.getElementById('plan-result');
-  out.innerHTML = '<h3>Plan rápido de ejemplo</h3><p>Paseo corto + café</p>';
+document.getElementById("btn-plan-rapido").addEventListener("click", () => {
+  const out = document.getElementById("plan-result");
+  out.innerHTML = "<h3>Plan rápido de ejemplo</h3><p>Paseo corto + café ☕</p>";
 });
 
 // ---------------------------
-// 🔥 Firestore: Users
+// 🔥 Firestore: Usuarios
 // ---------------------------
 
-// Agregar usuario de prueba
-document.getElementById('btn-add-user').addEventListener('click', async () => {
-  console.log("👉 Botón clickeado, intentando agregar usuario...");
+document.getElementById("btn-add-user").addEventListener("click", async () => {
   try {
     const docRef = await addDoc(collection(db, "users"), {
       name: "Usuario Demo",
@@ -113,7 +104,6 @@ document.getElementById('btn-add-user').addEventListener('click', async () => {
       mood: "😎 motivado",
       createdAt: new Date()
     });
-
     console.log("✅ Usuario agregado con ID:", docRef.id);
     cargarUsuarios();
   } catch (e) {
@@ -121,7 +111,6 @@ document.getElementById('btn-add-user').addEventListener('click', async () => {
   }
 });
 
-// Cargar usuarios de Firestore y mostrarlos
 async function cargarUsuarios() {
   const querySnapshot = await getDocs(collection(db, "users"));
   let html = "<ul>";
@@ -130,8 +119,72 @@ async function cargarUsuarios() {
     html += `<li><b>${data.name}</b> (${data.email}) — ${data.mood ?? "🤔"}</li>`;
   });
   html += "</ul>";
-  document.getElementById('user-result').innerHTML = html;
+  document.getElementById("user-result").innerHTML = html;
+}
+cargarUsuarios();
+
+// ---------------------------
+// 🌍 Firestore: Planes
+// ---------------------------
+
+// Referencias
+const formAddPlan = document.getElementById("form-add-plan");
+const plansList = document.getElementById("plans-list");
+
+// Agregar plan
+formAddPlan.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const title = document.getElementById("plan-title").value;
+  const description = document.getElementById("plan-description").value;
+  const location = document.getElementById("plan-location").value;
+  const category = document.getElementById("plan-category").value;
+  const mood = document.getElementById("plan-mood").value;
+  const duration = document.getElementById("plan-duration").value;
+  const cost = document.getElementById("plan-cost").value;
+
+  try {
+    await addDoc(collection(db, "plans"), {
+      title,
+      description,
+      location,
+      category,
+      mood,
+      duration,
+      cost,
+      createdAt: new Date()
+    });
+    alert("✅ Plan publicado correctamente 🎉");
+    formAddPlan.reset();
+    cargarPlanes();
+  } catch (error) {
+    console.error("❌ Error al agregar plan:", error);
+  }
+});
+
+// Cargar planes
+async function cargarPlanes() {
+  const querySnapshot = await getDocs(collection(db, "plans"));
+  let html = "";
+
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    html += `
+      <div class="plan-card">
+        <h3>${data.title}</h3>
+        <p>${data.description}</p>
+        <p><b>Ubicación:</b> ${data.location}</p>
+        <p><b>Categoría:</b> ${data.category}</p>
+        <p><b>Ánimo:</b> ${data.mood}</p>
+        <p><b>Duración:</b> ${data.duration}</p>
+        <p><b>Costo:</b> ${data.cost}</p>
+      </div>
+      <hr>
+    `;
+  });
+
+  plansList.innerHTML = html || "<p>No hay planes disponibles aún.</p>";
 }
 
-// Ejecutar carga inicial
-cargarUsuarios();
+cargarPlanes();
+
