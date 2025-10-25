@@ -3,6 +3,8 @@
   --celeste: #2196F3;
   --gris-claro: #f6f8ff;
   --sombra: rgba(0, 0, 0, 0.06);
+  --rojo-suave: #fee2e2;
+  --rojo-texto: #b91c1c;
   font-family: 'Inter', system-ui, Arial, sans-serif;
 }
 
@@ -12,7 +14,9 @@ body {
   color: #111;
 }
 
-/* HEADER */
+/* --------------------
+   🔝 HEADER SUPERIOR
+-------------------- */
 .topbar {
   background: var(--azul-osc);
   color: white;
@@ -20,7 +24,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .topbar h1 {
@@ -28,7 +32,15 @@ body {
   margin: 0;
 }
 
-/* CONTENEDOR PRINCIPAL */
+.topbar div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* --------------------
+   📦 CONTENEDOR PRINCIPAL
+-------------------- */
 .container {
   display: grid;
   gap: 20px;
@@ -37,7 +49,9 @@ body {
   margin: auto;
 }
 
-/* TARJETAS */
+/* --------------------
+   💳 TARJETAS
+-------------------- */
 .card {
   background: white;
   border-radius: 12px;
@@ -45,7 +59,9 @@ body {
   box-shadow: 0 6px 18px var(--sombra);
 }
 
-/* BOTONES */
+/* --------------------
+   🔘 BOTONES
+-------------------- */
 button {
   padding: 8px 14px;
   border-radius: 8px;
@@ -62,8 +78,11 @@ button:hover {
   transform: scale(1.05);
 }
 
-/* FORMULARIO PLANES */
-#form-add-plan input, #form-add-plan button {
+/* --------------------
+   🧾 FORMULARIO PLANES
+-------------------- */
+#form-add-plan input,
+#form-add-plan button {
   display: block;
   width: 100%;
   max-width: 400px;
@@ -74,13 +93,37 @@ button:hover {
   font-size: 0.95rem;
 }
 
-/* PLANES */
+#form-add-plan input:focus {
+  outline: 2px solid var(--celeste);
+}
+
+/* --------------------
+   💡 MENSAJE LOGIN
+-------------------- */
+#login-msg {
+  background: var(--rojo-suave);
+  color: var(--rojo-texto);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  margin-bottom: 15px;
+  border-left: 5px solid #ef4444;
+}
+
+/* --------------------
+   🗺️ PLANES
+-------------------- */
 .plan-card {
   background: #f9f9f9;
   border-radius: 10px;
   padding: 12px;
   margin-bottom: 15px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.15s ease;
+}
+
+.plan-card:hover {
+  transform: scale(1.01);
 }
 
 .plan-card h3 {
@@ -93,7 +136,9 @@ button:hover {
   line-height: 1.3;
 }
 
-/* LISTA USUARIOS */
+/* --------------------
+   👥 USUARIOS FIRESTORE
+-------------------- */
 #user-result ul {
   list-style: none;
   padding: 0;
@@ -103,35 +148,43 @@ button:hover {
   margin: 6px 0;
 }
 
-/* RESPONSIVE */
-@media (max-width: 600px) {
-  .container {
-    padding: 10px;
-  }
-
-  #form-add-plan input, #form-add-plan button {
-    max-width: 100%;
-  }
-}
+/* --------------------
+   👤 AUTOR DEL PLAN
+-------------------- */
 .autor {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-top: 8px;
+  background: #eef2ff;
+  border-radius: 8px;
+  padding: 6px 8px;
 }
 
 .autor-foto {
-  width: 25px;
-  height: 25px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
+  border: 1px solid #ddd;
 }
 
-#login-msg {
-  background: #fee2e2;
-  color: #b91c1c;
-  padding: 8px 10px;
-  border-radius: 8px;
-  font-weight: 500;
+/* --------------------
+   📱 RESPONSIVE
+-------------------- */
+@media (max-width: 600px) {
+  .container {
+    padding: 10px;
+  }
+
+  #form-add-plan input,
+  #form-add-plan button {
+    max-width: 100%;
+  }
+
+  .topbar h1 {
+    font-size: 1.1rem;
+  }
 }
+
 
 
