@@ -272,4 +272,37 @@ async function cargarPlanes() {
 
 cargarPlanes();
 
+// Detectar sesión activa y actualizar la interfaz
+onAuthStateChanged(auth, (user) => {
+  const formAddPlan = document.getElementById("form-add-plan");
+  const loginMsg = document.getElementById("login-msg");
+
+  if (user) {
+    console.log("🔵 Usuario conectado:", user.email);
+
+    // Mostrar botones correctos
+    btnLogin.style.display = "none";
+    btnLogout.style.display = "inline-block";
+    userInfo.style.display = "inline-flex";
+    userName.textContent = user.displayName;
+    userPhoto.src = user.photoURL;
+
+    // Habilitar formulario y ocultar mensaje
+    formAddPlan.style.display = "block";
+    if (loginMsg) loginMsg.style.display = "none";
+  } else {
+    console.log("⚪ Ningún usuario conectado");
+
+    // Mostrar botones correctos
+    btnLogin.style.display = "inline-block";
+    btnLogout.style.display = "none";
+    userInfo.style.display = "none";
+
+    // Ocultar formulario y mostrar mensaje
+    if (formAddPlan) formAddPlan.style.display = "none";
+    if (loginMsg) loginMsg.style.display = "block";
+  }
+});
+
+
 
