@@ -187,4 +187,89 @@ async function cargarPlanes() {
 }
 
 cargarPlanes();
+// ---------------------------
+// 🌍 Firestore: Planes (con usuario asociado)
+// ---------------------------
+
+const formAddPlan = document.getElementById("form-add-plan");
+const plansList = document.getElementById("plans-list");
+
+// Agregar plan (solo si hay sesión activa)
+formAddPlan.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const user = auth.currentUser;
+
+  if (!user) {
+    alert("⚠️ Debes iniciar sesión para publicar un plan.");
+    return;
+  }
+
+  // Capturar datos del formulario
+  const title = document.getElementById("plan-title").value;
+  const description = document.getElementById("plan-description").value;
+  const location = document.getElementById("plan-location").value;
+  const category = document.getElementById("plan-category").value;
+  const mood = document.getElementById("plan-mood").value;
+  const duration = document.getElementById("plan-duration").value;
+  const cost = document.getElementById("plan-cost").value;
+
+  try {
+    await addDoc(collection(db, "plans"), {
+      title,
+      description,
+      location,
+      category,
+      mood,
+      duration,
+      cost,
+      createdAt: new Date(),
+      createdBy: {
+        uid: user.uid,
+        name: user.displayName,
+        email: user.email,
+        photo: user.photoURL
+      }
+    });
+
+    alert("✅ Plan publicado correctamente 🎉");
+    formAddPlan.reset();
+    cargarPlanes();
+  } catch (error) {
+    console.error("❌ Error al agregar plan:", error);
+  }
+});
+
+// Cargar planes (mostrar también el autor)
+async function cargarPlanes() {
+  const querySnapshot = await getDocs(collection(db, "plans"));
+  let html = "";
+
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    html += `
+      <div class="plan-card">
+        <h3>${data.title}</h3>
+        <p>${data.description}</p>
+        <p><b>Ubicación:</b> ${data.location}</p>
+        <p><b>Categoría:</b> ${data.category}</p>
+        <p><b>Ánimo:</b> ${data.mood}</p>
+        <p><b>Duración:</b> ${data.duration}</p>
+        <p><b>Costo:</b> ${data.cost}</p>
+        ${data.createdBy ? `
+          <div class="autor">
+            <img src="${data.createdBy.photo}" alt="foto" class="autor-foto">
+            <small><b>${data.createdBy.name}</b> (${data.createdBy.email})</small>
+          </div>
+        ` : ''}
+      </div>
+      <hr>
+    `;
+  });
+
+  plansList.innerHTML = html || "<p>No hay planes disponibles aún.</p>";
+}
+
+cargarPlanes();
+
 
