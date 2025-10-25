@@ -113,4 +113,17 @@ button:hover {
     max-width: 100%;
   }
 }
+.autor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.autor-foto {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+}
+
 
