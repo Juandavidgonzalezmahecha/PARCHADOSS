@@ -36,6 +36,8 @@ const btnLogout = document.getElementById("btn-logout");
 const userInfo = document.getElementById("user-info");
 const userName = document.getElementById("user-name");
 const userPhoto = document.getElementById("user-photo");
+const formAddPlan = document.getElementById("form-add-plan");
+const loginMsg = document.getElementById("login-msg");
 
 // Iniciar sesión
 btnLogin.addEventListener("click", async () => {
@@ -44,7 +46,7 @@ btnLogin.addEventListener("click", async () => {
     const user = result.user;
     console.log("✅ Usuario autenticado:", user.email);
 
-    // Guardar en Firestore (si no existe)
+    // Guardar usuario en Firestore
     await addDoc(collection(db, "users"), {
       name: user.displayName,
       email: user.email,
@@ -68,18 +70,32 @@ btnLogout.addEventListener("click", async () => {
   }
 });
 
-// Detectar sesión activa
+// Detectar sesión activa y actualizar la UI
 onAuthStateChanged(auth, (user) => {
   if (user) {
+    console.log("🔵 Usuario conectado:", user.email);
+
+    // Mostrar botones correctos
     btnLogin.style.display = "none";
     btnLogout.style.display = "inline-block";
     userInfo.style.display = "inline-flex";
     userName.textContent = user.displayName;
     userPhoto.src = user.photoURL;
+
+    // Mostrar formulario y ocultar mensaje
+    formAddPlan.style.display = "block";
+    loginMsg.style.display = "none";
   } else {
+    console.log("⚪ Ningún usuario conectado");
+
+    // Ocultar elementos
     btnLogin.style.display = "inline-block";
     btnLogout.style.display = "none";
     userInfo.style.display = "none";
+
+    // Mostrar mensaje y ocultar formulario
+    formAddPlan.style.display = "none";
+    loginMsg.style.display = "block";
   }
 });
 
@@ -128,70 +144,6 @@ cargarUsuarios();
 // ---------------------------
 
 // Referencias
-const formAddPlan = document.getElementById("form-add-plan");
-const plansList = document.getElementById("plans-list");
-
-// Agregar plan
-formAddPlan.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const title = document.getElementById("plan-title").value;
-  const description = document.getElementById("plan-description").value;
-  const location = document.getElementById("plan-location").value;
-  const category = document.getElementById("plan-category").value;
-  const mood = document.getElementById("plan-mood").value;
-  const duration = document.getElementById("plan-duration").value;
-  const cost = document.getElementById("plan-cost").value;
-
-  try {
-    await addDoc(collection(db, "plans"), {
-      title,
-      description,
-      location,
-      category,
-      mood,
-      duration,
-      cost,
-      createdAt: new Date()
-    });
-    alert("✅ Plan publicado correctamente 🎉");
-    formAddPlan.reset();
-    cargarPlanes();
-  } catch (error) {
-    console.error("❌ Error al agregar plan:", error);
-  }
-});
-
-// Cargar planes
-async function cargarPlanes() {
-  const querySnapshot = await getDocs(collection(db, "plans"));
-  let html = "";
-
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
-    html += `
-      <div class="plan-card">
-        <h3>${data.title}</h3>
-        <p>${data.description}</p>
-        <p><b>Ubicación:</b> ${data.location}</p>
-        <p><b>Categoría:</b> ${data.category}</p>
-        <p><b>Ánimo:</b> ${data.mood}</p>
-        <p><b>Duración:</b> ${data.duration}</p>
-        <p><b>Costo:</b> ${data.cost}</p>
-      </div>
-      <hr>
-    `;
-  });
-
-  plansList.innerHTML = html || "<p>No hay planes disponibles aún.</p>";
-}
-
-cargarPlanes();
-// ---------------------------
-// 🌍 Firestore: Planes (con usuario asociado)
-// ---------------------------
-
-const formAddPlan = document.getElementById("form-add-plan");
 const plansList = document.getElementById("plans-list");
 
 // Agregar plan (solo si hay sesión activa)
@@ -261,7 +213,7 @@ async function cargarPlanes() {
             <img src="${data.createdBy.photo}" alt="foto" class="autor-foto">
             <small><b>${data.createdBy.name}</b> (${data.createdBy.email})</small>
           </div>
-        ` : ''}
+        ` : ""}
       </div>
       <hr>
     `;
@@ -272,37 +224,6 @@ async function cargarPlanes() {
 
 cargarPlanes();
 
-// Detectar sesión activa y actualizar la interfaz
-onAuthStateChanged(auth, (user) => {
-  const formAddPlan = document.getElementById("form-add-plan");
-  const loginMsg = document.getElementById("login-msg");
-
-  if (user) {
-    console.log("🔵 Usuario conectado:", user.email);
-
-    // Mostrar botones correctos
-    btnLogin.style.display = "none";
-    btnLogout.style.display = "inline-block";
-    userInfo.style.display = "inline-flex";
-    userName.textContent = user.displayName;
-    userPhoto.src = user.photoURL;
-
-    // Habilitar formulario y ocultar mensaje
-    formAddPlan.style.display = "block";
-    if (loginMsg) loginMsg.style.display = "none";
-  } else {
-    console.log("⚪ Ningún usuario conectado");
-
-    // Mostrar botones correctos
-    btnLogin.style.display = "inline-block";
-    btnLogout.style.display = "none";
-    userInfo.style.display = "none";
-
-    // Ocultar formulario y mostrar mensaje
-    if (formAddPlan) formAddPlan.style.display = "none";
-    if (loginMsg) loginMsg.style.display = "block";
-  }
-});
 
 
 
