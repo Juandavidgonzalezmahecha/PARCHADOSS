@@ -126,4 +126,12 @@ button:hover {
   border-radius: 50%;
 }
 
+#login-msg {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
 
