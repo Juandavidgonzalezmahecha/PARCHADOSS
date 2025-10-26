@@ -30,14 +30,11 @@ console.log("✅ Firebase conectado correctamente");
 // ---------------------------
 // 🔐 Autenticación con Google
 // ---------------------------
-
 const btnLogin = document.getElementById("btn-login");
 const btnLogout = document.getElementById("btn-logout");
 const userInfo = document.getElementById("user-info");
 const userName = document.getElementById("user-name");
 const userPhoto = document.getElementById("user-photo");
-const formAddPlan = document.getElementById("form-add-plan");
-const loginMsg = document.getElementById("login-msg");
 
 // Iniciar sesión
 btnLogin.addEventListener("click", async () => {
@@ -46,7 +43,6 @@ btnLogin.addEventListener("click", async () => {
     const user = result.user;
     console.log("✅ Usuario autenticado:", user.email);
 
-    // Guardar usuario en Firestore
     await addDoc(collection(db, "users"), {
       name: user.displayName,
       email: user.email,
@@ -70,48 +66,33 @@ btnLogout.addEventListener("click", async () => {
   }
 });
 
-// Detectar sesión activa y actualizar la UI
+// Detectar sesión activa
 onAuthStateChanged(auth, (user) => {
-  if (user) {
-    console.log("🔵 Usuario conectado:", user.email);
+  const formAddPlan = document.getElementById("form-add-plan");
+  const loginMsg = document.getElementById("login-msg");
 
-    // Mostrar botones correctos
+  if (user) {
     btnLogin.style.display = "none";
     btnLogout.style.display = "inline-block";
     userInfo.style.display = "inline-flex";
     userName.textContent = user.displayName;
     userPhoto.src = user.photoURL;
 
-    // Mostrar formulario y ocultar mensaje
     formAddPlan.style.display = "block";
-    loginMsg.style.display = "none";
+    if (loginMsg) loginMsg.style.display = "none";
   } else {
-    console.log("⚪ Ningún usuario conectado");
-
-    // Ocultar elementos
     btnLogin.style.display = "inline-block";
     btnLogout.style.display = "none";
     userInfo.style.display = "none";
 
-    // Mostrar mensaje y ocultar formulario
     formAddPlan.style.display = "none";
-    loginMsg.style.display = "block";
+    if (loginMsg) loginMsg.style.display = "block";
   }
-});
-
-// ---------------------------
-// 🧠 Lógica básica del prototipo
-// ---------------------------
-
-document.getElementById("btn-plan-rapido").addEventListener("click", () => {
-  const out = document.getElementById("plan-result");
-  out.innerHTML = "<h3>Plan rápido de ejemplo</h3><p>Paseo corto + café ☕</p>";
 });
 
 // ---------------------------
 // 🔥 Firestore: Usuarios
 // ---------------------------
-
 document.getElementById("btn-add-user").addEventListener("click", async () => {
   try {
     const docRef = await addDoc(collection(db, "users"), {
@@ -140,24 +121,21 @@ async function cargarUsuarios() {
 cargarUsuarios();
 
 // ---------------------------
-// 🌍 Firestore: Planes
+// 🌍 Firestore: Planes (con filtros y búsqueda)
 // ---------------------------
-
-// Referencias
+const formAddPlan = document.getElementById("form-add-plan");
 const plansList = document.getElementById("plans-list");
 
-// Agregar plan (solo si hay sesión activa)
+// Agregar plan
 formAddPlan.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const user = auth.currentUser;
-
   if (!user) {
     alert("⚠️ Debes iniciar sesión para publicar un plan.");
     return;
   }
 
-  // Capturar datos del formulario
   const title = document.getElementById("plan-title").value;
   const description = document.getElementById("plan-description").value;
   const location = document.getElementById("plan-location").value;
@@ -192,13 +170,23 @@ formAddPlan.addEventListener("submit", async (e) => {
   }
 });
 
-// Cargar planes (mostrar también el autor)
+// ---------------------------
+// 🔎 Cargar y filtrar planes
+// ---------------------------
+let todosLosPlanes = [];
+
 async function cargarPlanes() {
   const querySnapshot = await getDocs(collection(db, "plans"));
-  let html = "";
-
+  todosLosPlanes = [];
   querySnapshot.forEach((doc) => {
-    const data = doc.data();
+    todosLosPlanes.push(doc.data());
+  });
+  mostrarPlanes(todosLosPlanes);
+}
+
+function mostrarPlanes(planes) {
+  let html = "";
+  planes.forEach((data) => {
     html += `
       <div class="plan-card">
         <h3>${data.title}</h3>
@@ -212,16 +200,46 @@ async function cargarPlanes() {
           <div class="autor">
             <img src="${data.createdBy.photo}" alt="foto" class="autor-foto">
             <small><b>${data.createdBy.name}</b> (${data.createdBy.email})</small>
-          </div>
-        ` : ""}
+          </div>` : ""}
       </div>
       <hr>
     `;
   });
-
   plansList.innerHTML = html || "<p>No hay planes disponibles aún.</p>";
 }
 
+// ---------------------------
+// 🧭 Filtros dinámicos
+// ---------------------------
+const searchBar = document.getElementById("search-bar");
+const filterCategory = document.getElementById("filter-category");
+const filterMood = document.getElementById("filter-mood");
+const filterCost = document.getElementById("filter-cost");
+
+function aplicarFiltros() {
+  const texto = searchBar.value.toLowerCase();
+  const categoria = filterCategory.value.toLowerCase();
+  const animo = filterMood.value.toLowerCase();
+  const costo = filterCost.value.toLowerCase();
+
+  const filtrados = todosLosPlanes.filter(p => {
+    const coincideTexto = p.title.toLowerCase().includes(texto) ||
+                          p.description.toLowerCase().includes(texto);
+    const coincideCategoria = !categoria || p.category.toLowerCase().includes(categoria);
+    const coincideAnimo = !animo || p.mood.toLowerCase().includes(animo);
+    const coincideCosto = !costo || p.cost.toLowerCase().includes(costo);
+    return coincideTexto && coincideCategoria && coincideAnimo && coincideCosto;
+  });
+
+  mostrarPlanes(filtrados);
+}
+
+searchBar.addEventListener("input", aplicarFiltros);
+filterCategory.addEventListener("change", aplicarFiltros);
+filterMood.addEventListener("change", aplicarFiltros);
+filterCost.addEventListener("change", aplicarFiltros);
+
+// Carga inicial
 cargarPlanes();
 
 
