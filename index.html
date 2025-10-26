@@ -35,12 +35,39 @@
     <section id="explorar" class="card">
       <h2>Explorar planes</h2>
 
-      <!-- Mensaje si el usuario no está logueado -->
+      <!-- 🔒 Mensaje de login -->
       <div id="login-msg" style="display:none; color:#b91c1c; margin-bottom:10px;">
         🔒 Inicia sesión para poder publicar tu plan.
       </div>
 
-      <!-- Formulario para publicar un plan -->
+      <!-- 🔍 Buscador y filtros -->
+      <div id="filtros" class="filters">
+        <input type="text" id="search-bar" placeholder="Buscar plan...">
+        <select id="filter-category">
+          <option value="">Categoría</option>
+          <option value="cultura">Cultura</option>
+          <option value="deporte">Deporte</option>
+          <option value="gastronomía">Gastronomía</option>
+          <option value="relax">Relax</option>
+          <option value="aventura">Aventura</option>
+        </select>
+        <select id="filter-mood">
+          <option value="">Ánimo</option>
+          <option value="relajado">Relajado</option>
+          <option value="fiestero">Fiestero</option>
+          <option value="romántico">Romántico</option>
+          <option value="motivador">Motivador</option>
+        </select>
+        <select id="filter-cost">
+          <option value="">Costo</option>
+          <option value="Gratis">Gratis</option>
+          <option value="$">Económico</option>
+          <option value="$$">Medio</option>
+          <option value="$$$">Alto</option>
+        </select>
+      </div>
+
+      <!-- 📝 Formulario para publicar un plan -->
       <form id="form-add-plan" style="margin-bottom:20px;">
         <input type="text" id="plan-title" placeholder="Título del plan" required>
         <input type="text" id="plan-description" placeholder="Descripción" required>
@@ -52,7 +79,7 @@
         <button type="submit">Publicar plan</button>
       </form>
 
-      <!-- Lista de planes -->
+      <!-- 📋 Lista de planes -->
       <div id="plans-list"></div>
     </section>
 
@@ -68,5 +95,6 @@
   <script type="module" src="./src/app.js"></script>
 </body>
 </html>
+
 
 
